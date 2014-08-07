@@ -9,13 +9,15 @@ final="s3://extensions.musescore.org/languages/"
 pull=subprocess.Popen(['tx','-q','pull','-a'])
 pull.communicate()
 langs= glob.glob(dir+"*.ts")
+langs.remove('share/locale/mscore_en.ts')
 counter = 0
 translationChanged = False
 entry = {}
 
+#read languages.txt
 r=open("languages.txt","r")
 read = r.readline()
-langs_ = dict()
+langs_ = dict() # language code --> name
 while read != "":
 	read_name = r.readline()
 	#print "read " + read
@@ -34,7 +36,7 @@ for item in langs:
 	lang_code = item.split('/')[-1]
 	lang_code = lang_code[lang_code.index('_')+1:]
 	lang_code = lang_code.split('.')[0]
-	#print "lang_code" + lang_code
+	#print "lang_code " + lang_code
 	lang_time=int(os.path.getmtime(item))
 	cur_time=int(time.time())
 	#print cur_time,lang_time,cur_time-lang_time
@@ -44,6 +46,7 @@ for item in langs:
 		filename = 'mscore_' + lang_code
 		languageFileTs = dir + filename + '.ts'
 		languageFileQm = dir + filename + '.qm'
+		#print languageFileTs + " " +languageFileQm
 		lrelease=subprocess.Popen(['lrelease', languageFileTs, '-qm', languageFileQm])
 		lrelease.communicate()
 		file_size=os.path.getsize(languageFileQm)

@@ -10,6 +10,8 @@ bg
 български
 ca
 Català
+ca@valencia
+Valencià
 cs
 Čeština
 da
@@ -20,7 +22,7 @@ el
 ελληνικά
 en_GB
 English (GB)
-en
+en_US
 English (US)
 eo
 Esperanto
@@ -54,14 +56,20 @@ it
 Italiano
 ja
 Japanese
+ka
+ქართული
 ko
 한국어
+mn_MN
+Монгол хэл
 lt
 Lietuvių
 nl
 Nederlands
 nb
-Norsk
+Norsk (Bokmål)
+nn
+Norsk (Nynorsk)
 pl
 Polski
 pt
@@ -86,6 +94,8 @@ tr
 Türkçe
 uk
 Ukrajina
+uz@Latn
+Ozbek tili
 vi
 Tiếng Việt
 zh_CN
