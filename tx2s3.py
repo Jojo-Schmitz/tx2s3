@@ -68,7 +68,6 @@ else:
 
 
 for lang_code, languageName in langCodeNameDict.iteritems():
-	print lang_code
 	filename = 'mscore_' + lang_code
 	tsFilePath = outputDir + filename + ".ts"
 
