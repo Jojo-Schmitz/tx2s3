@@ -79,16 +79,16 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 	# if the file has been updated, update or add entry in details.json
 	if cur_time - lang_time < period or newDetailsFile:
 		processTsFile("mscore", lang_code, data)
-		#push_s3 = subprocess.Popen(['s3cmd', 'put', '--acl-public', '--guess-mime-type', qmFilePath, s3Url + filename+'.qm'])
-		#push_s3.communicate()
+		push_s3 = subprocess.Popen(['s3cmd', 'put', '--acl-public', '--guess-mime-type', qmFilePath, s3Url + filename +'.qm'])
+		push_s3.communicate()
 		translationChanged = True
 
 json_file = open(outputDir + "details.json", "w")
 json_file.write(json.dumps(data, sort_keys=True, indent=4))
 json_file.close()
 
-#if translationChanged:
-	#push_json=subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir+'details.json', s3Url + 'details.json'])
-	#push_json.communicate()
+if translationChanged:
+	push_json=subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir+'details.json', s3Url + 'details.json'])
+	push_json.communicate()
 	
 	
