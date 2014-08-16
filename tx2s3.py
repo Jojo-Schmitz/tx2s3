@@ -1,81 +1,94 @@
-import glob,subprocess
-import os
-import time,hashlib,json
+import glob, subprocess
+import os, sys, io
+import time, hashlib, json
 
 #needs to be equal or smaller than the cron
 period=300
-dir="share/locale/"
-final="s3://extensions.musescore.org/languages/"
-pull=subprocess.Popen(['tx','-q','pull','-a'])
+outputDir = "share/locale/"
+s3Url = "s3://extensions.musescore.org/languages/"
+
+def processTsFile(prefix, langCode, data):
+	filename = prefix + '_' + lang_code
+	tsFilePath = outputDir + filename + ".ts"
+	qmFilePath = outputDir + filename + ".qm"
+		
+	# generate qm file
+	lrelease = subprocess.Popen(['lrelease', tsFilePath, '-qm', qmFilePath])
+	lrelease.communicate()
+	
+	# get qm file size
+	file_size = os.path.getsize(qmFilePath)
+	file_size = "%.2f" % (float(file_size) / 1024)
+	
+	#compute Qm file hash
+	file = open(qmFilePath)
+	hash_file = hashlib.sha1()
+	hash_file.update(file.read())
+	
+	if lang_code not in data:
+		data[lang_code] = {}
+	#if prefix not in data[lang_code]
+	#	data[lang_code][prefix] = {}
+
+	data[lang_code]["file_name"] = filename + ".qm"
+	data[lang_code]["name"] = langCodeNameDict[lang_code]
+	data[lang_code]["hash"] = str(hash_file.hexdigest())
+	data[lang_code]["file_size"] = file_size
+
+
+#pull ts files from transifex, use .tx/config
+pull = subprocess.Popen(['tx', '-q', 'pull', '-a'])
 pull.communicate()
-langs= glob.glob(dir+"*.ts")
-langs.remove('share/locale/mscore_en.ts')
-counter = 0
+
+
+tsFilePaths = glob.glob(outputDir + "*.ts")
+if "share/locale/mscore_en.ts" in tsFilePaths:
+	tsFilePaths.remove("share/locale/mscore_en.ts")
+
+newDetailsFile = False
 translationChanged = False
-entry = {}
 
-#read languages.txt
-r=open("languages.txt","r")
-read = r.readline()
-langs_ = dict() # language code --> name
-while read != "":
-	read_name = r.readline()
-	#print "read " + read
-	langs_[read.split('\n')[0]]=read_name.split('\n')[0]
-	read = r.readline()
-try:
-	json_data = open(dir+'details.json','r+')
-	data = json.load(json_data)
-except:
-	counter = 1
-	entry["type"] = "Languages"
-	entry["version"] = "2.0"
-	json_data = open(dir+"details.json","w")
 
-for item in langs:
-	lang_code = item.split('/')[-1]
-	lang_code = lang_code[lang_code.index('_')+1:]
-	lang_code = lang_code.split('.')[0]
-	#print "lang_code " + lang_code
-	lang_time=int(os.path.getmtime(item))
-	cur_time=int(time.time())
+#read languages.json and store language code and name
+langCode_file = open("languages.json", "r+")
+langCodeNameDict = json.load(langCode_file)  # language code --> name
+langCode_file.close()
+
+detailsJson = outputDir + "details.json"
+# read details.json or create it
+if os.path.isfile(detailsJson):
+	json_file = open(outputDir + "details.json", "r+")
+	data = json.load(json_file)
+	json_file.close()
+else:
+	newDetailsFile = True
+	data = {}
+	data["type"] = "Languages"
+	data["version"] = "2.0"
+
+
+for lang_code, languageName in langCodeNameDict.iteritems():
+	print lang_code
+	filename = 'mscore_' + lang_code
+	tsFilePath = outputDir + filename + ".ts"
+
+	lang_time = int(os.path.getmtime(tsFilePath))
+	cur_time = int(time.time())
 	#print cur_time,lang_time,cur_time-lang_time
 	
-	if cur_time - lang_time < period or counter==1:
-		hash_file=hashlib.sha1()
-		filename = 'mscore_' + lang_code
-		languageFileTs = dir + filename + '.ts'
-		languageFileQm = dir + filename + '.qm'
-		#print languageFileTs + " " +languageFileQm
-		lrelease=subprocess.Popen(['lrelease', languageFileTs, '-qm', languageFileQm])
-		lrelease.communicate()
-		file_size=os.path.getsize(languageFileQm)
-		file_size="%.2f" %(float(file_size)/1024)
-		#print lang_code
-		file=open(languageFileQm)
-		hash_file.update(file.read())
-		if counter==1:
-			entry[lang_code]={"file_name":filename+".qm","hash":hash_file.hexdigest(),"name":langs_[lang_code],"file_size":file_size}
-
-		else:
-			data[lang_code]["hash"]=str(hash_file.hexdigest())
-			data[lang_code]["file_size"]=file_size
-			#print data[lang_code]["hash"]
-		push_s3=subprocess.Popen(['s3cmd','put','--acl-public','--guess-mime-type', languageFileQm,final+filename+'.qm'])
-		push_s3.communicate()
+	# if the file has been updated, update or add entry in details.json
+	if cur_time - lang_time < period or newDetailsFile:
+		processTsFile("mscore", lang_code, data)
+		#push_s3 = subprocess.Popen(['s3cmd', 'put', '--acl-public', '--guess-mime-type', qmFilePath, s3Url + filename+'.qm'])
+		#push_s3.communicate()
 		translationChanged = True
-if counter==1:
-	print entry
-	json_data.write(json.dumps(entry))
-	json_data.close()
-else:
-	json_data.close()
-	json_data=open(dir+"details.json","w")
-	json_data.write(json.dumps(data,json_data))
-	json_data.close()
 
-if translationChanged:
-	push_json=subprocess.Popen(['s3cmd','put','--acl-public','--guess-mime-type',dir+'details.json',final+'details.json'])
-	push_json.communicate()
+json_file = open(outputDir + "details.json", "w")
+json_file.write(json.dumps(data, sort_keys=True, indent=4))
+json_file.close()
+
+#if translationChanged:
+	#push_json=subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir+'details.json', s3Url + 'details.json'])
+	#push_json.communicate()
 	
 	
