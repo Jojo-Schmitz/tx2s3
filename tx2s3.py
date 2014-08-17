@@ -109,8 +109,8 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 		data[lang_code]["hash"] = str(hash_file.hexdigest())
 		data[lang_code]["file_size"] = file_size
 
-		#push_zip = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', zipPath, s3Url + zipName])
-		#push_zip.communicate()
+		push_zip = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', zipPath, s3Url + zipName])
+		push_zip.communicate()
 
 
 
@@ -118,8 +118,8 @@ json_file = open(outputDir + "details.json", "w")
 json_file.write(json.dumps(data, sort_keys=True, indent=4))
 json_file.close()
 
-#if translationChanged:
-	#push_json = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir + 'details.json', s3Url + 'details.json'])
-	#push_json.communicate()
+if translationChanged:
+	push_json = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir + 'details.json', s3Url + 'details.json'])
+	push_json.communicate()
 	
 	
