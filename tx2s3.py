@@ -6,7 +6,7 @@ import zipfile
 #needs to be equal or smaller than the cron
 period=300
 outputDir = "share/locale/"
-s3Url = "s3://extensions.musescore.org/2.0/languages/"
+s3Urls = ["s3://extensions.musescore.org/2.1/languages/"]
 
 def processTsFile(prefix, langCode, data):
 	filename = prefix + '_' + lang_code
@@ -18,7 +18,7 @@ def processTsFile(prefix, langCode, data):
 	#print cur_time,lang_time,cur_time-lang_time
 	
 	# if the file has been updated, update or add entry in details.json
-	if cur_time - lang_time < period:
+	if (cur_time - lang_time < period) or not os.path.isfile(qmFilePath):
 		# generate qm file
 		lrelease = subprocess.Popen(['lrelease', tsFilePath, '-qm', qmFilePath])
 		lrelease.communicate()
@@ -82,7 +82,6 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 	
 	updateInstruments = processTsFile("instruments", lang_code, data)
 	translationChanged = updateInstruments or translationChanged
-
 	if (updateMscore or updateInstruments):
 		#create a zip file, compute size, hash, add it to json and save to s3
 		zipName = 'locale_' + lang_code + '.zip'
@@ -108,9 +107,9 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 		data[lang_code]["name"] = langCodeNameDict[lang_code]
 		data[lang_code]["hash"] = str(hash_file.hexdigest())
 		data[lang_code]["file_size"] = file_size
-
-		push_zip = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', zipPath, s3Url + zipName])
-		push_zip.communicate()
+		for s3Url in s3Urls:
+			push_zip = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', zipPath, s3Url + zipName])
+			push_zip.communicate()
 
 
 
@@ -119,7 +118,8 @@ json_file.write(json.dumps(data, sort_keys=True, indent=4))
 json_file.close()
 
 if translationChanged:
-	push_json = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir + 'details.json', s3Url + 'details.json'])
-	push_json.communicate()
+	for s3Url in s3Urls:
+		push_json = subprocess.Popen(['s3cmd','put','--acl-public', '--guess-mime-type', outputDir + 'details.json', s3Url + 'details.json'])
+		push_json.communicate()
 	
 	
