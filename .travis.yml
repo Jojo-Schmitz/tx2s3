@@ -2,6 +2,9 @@ language: python
 python:
   - "2.7"
 
+cache:
+  directories:
+  - share
 
 before_script: before.sh
 script: tx2s3.sh
