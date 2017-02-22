@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pip install transifex-client
+
 cat >~/.transifexrc <<EOL
 [https://www.transifex.com]
 hostname = https://www.transifex.com
