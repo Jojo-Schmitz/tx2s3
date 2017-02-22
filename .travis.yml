@@ -6,5 +6,5 @@ cache:
   directories:
   - share
 
-before_script: before.sh
+install: install.sh
 script: tx2s3.sh
