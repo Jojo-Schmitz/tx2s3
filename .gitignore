@@ -1,3 +1,4 @@
 *.ts
 *.qm
 details.json
+share/
