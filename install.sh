@@ -8,7 +8,7 @@ token =
 username = ${TRANSIFEX_USER}
 EOL
 
-pip install --user s3cmd
+pip install s3cmd
 
 cat >~/.s3cfg <<EOL
 [default]
