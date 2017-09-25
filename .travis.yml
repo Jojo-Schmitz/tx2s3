@@ -7,5 +7,5 @@ cache:
   directories:
   - share
 
-install: ./install.sh
+install: source ./install.sh
 script: ./tx2s3.sh
