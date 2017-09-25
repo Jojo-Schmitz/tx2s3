@@ -5,6 +5,7 @@ mkdir qt5
 wget -q -O qt5.zip http://utils.musescore.org.s3.amazonaws.com/qt542.zip
 unzip -qq qt5.zip -d qt5
 export PATH="${PWD}/qt5/bin:$PATH"
+lrelease -version
 
 pip install transifex-client
 
