@@ -87,7 +87,11 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 
     updateInstruments = processTsFile("instruments", lang_code, data)
     translationChanged = updateInstruments or translationChanged
-    if (updateMscore or updateInstruments):
+
+    updateTours = processTsFile("tours", lang_code, data)
+    translationChanged = updateTours or translationChanged
+
+    if (updateMscore or updateInstruments or updateTours):
         #create a zip file, compute size, hash, add it to json and save to s3
         zipName = 'locale_' + lang_code + '.zip'
         zipPath = outputDir + zipName
