@@ -100,6 +100,8 @@ for lang_code, languageName in langCodeNameDict.iteritems():
         myzip.write(qmFilePath, 'mscore_' + lang_code + ".qm")
         qmFilePath = outputDir + 'instruments_' + lang_code + ".qm"
         myzip.write(qmFilePath, 'instruments_' + lang_code + ".qm")
+        qmFilePath = outputDir + 'tours_' + lang_code + ".qm"
+        myzip.write(qmFilePath, 'tours_' + lang_code + ".qm")
         myzip.close()
 
         # get zip file size
