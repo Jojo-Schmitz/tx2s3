@@ -2,7 +2,7 @@
 
 #install recent version of lrelease
 mkdir qt5
-wget -q -O qt5.zip http://utils.musescore.org.s3.amazonaws.com/qt5120.zip
+wget -q -O qt5.zip https://s3.amazonaws.com/utils.musescore.org/qt5124.zip
 unzip -qq qt5.zip -d qt5
 export PATH="${PWD}/qt5/bin:$PATH"
 lrelease -version
