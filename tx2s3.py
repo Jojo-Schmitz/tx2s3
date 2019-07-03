@@ -24,7 +24,7 @@ def processTsFile(prefix, langCode, data):
     #print cur_time,lang_time,cur_time-lang_time
 
     # if the file has been updated, update or add entry in details.json
-    if (cur_time - lang_time < period) or not os.path.isfile(qmFilePath):
+    if True:#(cur_time - lang_time < period) or not os.path.isfile(qmFilePath):
         # generate qm file
         lrelease = subprocess.Popen(['lrelease', tsFilePath, '-qm', qmFilePath])
         lrelease.communicate()
@@ -47,7 +47,7 @@ def processTsFile(prefix, langCode, data):
         data[lang_code][prefix]["file_name"] = filename + ".qm"
         data[lang_code][prefix]["hash"] = str(hash_file.hexdigest())
         data[lang_code][prefix]["file_size"] = file_size
-
+        print langCode
         return True
     else:
         print prefix + ' ' + lang_code + " not changed"
