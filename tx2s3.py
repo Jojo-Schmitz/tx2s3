@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import glob
 import subprocess
 import os
@@ -21,7 +23,7 @@ def processTsFile(prefix, langCode, data):
 
     lang_time = int(os.path.getmtime(tsFilePath))
     cur_time = int(time.time())
-    #print cur_time,lang_time,cur_time-lang_time
+    #print(cur_time,lang_time,cur_time-lang_time)
 
     # if the file has been updated, update or add entry in details.json
     if (cur_time - lang_time < period) or not os.path.isfile(qmFilePath):
@@ -31,7 +33,7 @@ def processTsFile(prefix, langCode, data):
 
         # get qm file size
         file_size = os.path.getsize(qmFilePath)
-        file_size = "%.2f" % (float(file_size) / 1024)
+        file_size = "%.2f" % (float(file_size) // 1024)
 
         #compute Qm file hash
         file = open(qmFilePath)
@@ -50,7 +52,7 @@ def processTsFile(prefix, langCode, data):
 
         return True
     else:
-        print prefix + ' ' + lang_code + " not changed"
+        print(prefix + ' ' + lang_code + " not changed")
         return False
 
 
@@ -106,7 +108,7 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 
         # get zip file size
         file_size = os.path.getsize(zipPath)
-        file_size = "%.2f" % (float(file_size) / 1024)
+        file_size = "%.2f" % (float(file_size) // 1024)
 
         #compute zip file hash
         file = open(zipPath)
