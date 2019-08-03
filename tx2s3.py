@@ -37,7 +37,7 @@ def processTsFile(prefix, langCode, data):
         file_size = "%.2f" % (file_size / 1024)
 
         #compute Qm file hash
-        file = open(qmFilePath)
+        file = open(qmFilePath, 'rb')
         hash_file = hashlib.sha1()
         hash_file.update(file.read())
         file.close()
@@ -112,7 +112,7 @@ for lang_code, languageName in langCodeNameDict.items():
         file_size = "%.2f" % (file_size / 1024)
 
         #compute zip file hash
-        file = open(zipPath)
+        file = open(zipPath, 'rb')
         hash_file = hashlib.sha1()
         hash_file.update(file.read())
         file.close()
