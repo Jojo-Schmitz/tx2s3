@@ -15,6 +15,7 @@ period = 300
 outputDir = "share/locale/"
 s3Urls = ["s3://extensions.musescore.org/3.3/languages/"]
 
+print("Last changes: 3 Aug 2019")
 
 def processTsFile(prefix, langCode, data):
     filename = prefix + '_' + lang_code
@@ -33,7 +34,7 @@ def processTsFile(prefix, langCode, data):
 
         # get qm file size
         file_size = os.path.getsize(qmFilePath)
-        file_size = "%.2f" % (float(file_size) // 1024)
+        file_size = "%.2f" % (file_size / 1024)
 
         #compute Qm file hash
         file = open(qmFilePath)
@@ -108,7 +109,7 @@ for lang_code, languageName in langCodeNameDict.iteritems():
 
         # get zip file size
         file_size = os.path.getsize(zipPath)
-        file_size = "%.2f" % (float(file_size) // 1024)
+        file_size = "%.2f" % (file_size / 1024)
 
         #compute zip file hash
         file = open(zipPath)
