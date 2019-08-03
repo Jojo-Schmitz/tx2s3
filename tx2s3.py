@@ -9,7 +9,6 @@ import time
 import hashlib
 import json
 import zipfile
-from future.utils import iteritems
 
 #needs to be equal or smaller than the cron
 period = 300
@@ -85,7 +84,7 @@ else:
 
 
 translationChanged = newDetailsFile
-for lang_code, languageName in iteritems(langCodeNameDict):
+for lang_code, languageName in langCodeNameDict.items():
     updateMscore = processTsFile("mscore", lang_code, data)
     translationChanged = updateMscore or translationChanged
 
